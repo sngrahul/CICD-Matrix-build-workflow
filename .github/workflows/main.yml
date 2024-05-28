@@ -64,9 +64,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: testing-env
     steps:
-      - name: Test the build
+      - name: List the files
+        
         run: |
           ls -la ${{ github.workspace }}
+        run: echo " Testing done by listing files"
         
           
                     
