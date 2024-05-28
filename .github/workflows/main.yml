@@ -1,0 +1,27 @@
+#Trigger matrix build
+name: matrix build-workflow
+on: 
+      push:
+            branches:
+            - main
+      pull_request:
+            branches:
+            - main
+      workflow_dispatch: 
+            required: true
+#CI/CD job with matrix build and upload artifact           
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        java-version: [17, 18]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: setup java
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version}}
+          distribution: 'temurin'
