@@ -68,7 +68,7 @@ jobs:
         
         run: |
           ls -la ${{ github.workspace }}
-        run: echo " Testing done by listing files"
+      - run: echo " Testing done by listing files"
         
           
                     
