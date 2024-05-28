@@ -1,5 +1,5 @@
-#Trigger matrix build
-name: matrix build-workflow
+#Matrix  workflow
+name: Matrix-workflow
 on: 
       push:
             branches:
@@ -7,9 +7,7 @@ on:
       pull_request:
             branches:
             - main
-      workflow_dispatch: 
-            required: true
-#CI/CD job with matrix build and upload artifact           
+#CI/CD job with matrix build          
 jobs:
   build:
     strategy:
@@ -25,3 +23,57 @@ jobs:
         with:
           java-version: ${{ matrix.java-version}}
           distribution: 'temurin'
+      ##- name: composite action
+        ##uses: ./.github/workflows
+      - name: create data
+        run: |
+            printf '{
+              "data_1": "Text data",
+              "data_2": true
+              }' >> testartifact.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: testartifact.json
+          path: ./
+
+              
+              
+      
+       
+ #Download artifact 
+  Deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: development 
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+      - name: download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: testartifact.json
+          path: main
+      - name: Build project
+        run: echo "Build project"
+      - name: Deploy
+        run: echo "Deploying.."
+  test:
+    needs: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test the build
+        run: |
+          ls ${{ github.workspace }}
+        
+          
+                    
+      
+
+        
+
+  
+   
+        
+      
