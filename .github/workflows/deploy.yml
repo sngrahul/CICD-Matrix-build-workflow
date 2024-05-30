@@ -1,0 +1,48 @@
+name: deploy
+
+run-name: deploy-by-${{ github.actor}}-to-${{ inputs.environments }}
+
+on: 
+    workflow_dispatch:
+        inputs:
+            environments:
+                description: To deploy for env
+                type: environment
+                required: true
+            artifactName:
+                description: Artifact Name
+                type: string
+                required: true   
+            workflow_id: 
+                description: artifacts workflow id
+                type: string             
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environments }}
+        permissions: write-all
+        steps:
+            - name: download artifacts
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+              uses: Capgemini-Innersource/gha_actions/.github/actions/download-artifact@main
+              with:
+                owner: ${{ github.repository_owner }}
+                repo: ${{ github.event.repository.name }}
+                run-id: ${{ inputs.workflow_id }}
+                ArtifactName: ${{ inputs.artifactName }}
+                download-path: ./downloaded-artifact
+
+            - name: echo artifacts
+              run: |
+                cd downloaded-artifact
+                ls -la
+          
+            - name: Restart IIS
+              run: |
+                echo "restart IIS"
+
+            - name: check status
+              run: |
+                echo "IIS Status"

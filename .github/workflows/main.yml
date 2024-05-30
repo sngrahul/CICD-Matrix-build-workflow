@@ -1,12 +1,43 @@
-#Matrix  workflow
-name: Matrix-workflow
-on: 
-      push:
-            branches:
-            - main
-      pull_request:
-            branches:
-            - main
+#CICD  workflow
+name: CI-CD
+on:
+    workflow_dispatch:
+        inputs:
+          environments:
+              description: Environment deployment
+              type: environment
+              required: true
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: code checkout
+              uses: actions/checkout@v4
+            - name: dotnet setup
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: '6.0.x'
+            - name: Restore dependencies
+              run: |
+                dotnet restore
+            - name: dotnet build
+              run: |
+                dotnet build
+            - name: Dotnet publish
+              run: |
+                dotnet publish -o ${{ vars.artifactpath }}
+            - name: upload artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Dotnet artifact
+                  path: ${{ github.workspace }}/${{ vars.artifactpath }}
+
+
+
+
+           
+            
+  
 #CI/CD job with matrix build          
 jobs:
   build:
