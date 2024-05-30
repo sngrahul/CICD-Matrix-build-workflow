@@ -1,4 +1,8 @@
 #CI/CD job with matrix build          
+name: CICD matrix build
+on:
+    workflow_dispatch:
+          required: true
 jobs:
     build:
       strategy:
