@@ -1,114 +1,63 @@
-#CICD  workflow
-name: CI-CD
-on:
-    workflow_dispatch:
-        inputs:
-          environments:
-              description: Environment deployment
-              type: environment
-              required: true
-jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: code checkout
-              uses: actions/checkout@v4
-            - name: dotnet setup
-              uses: actions/setup-dotnet@v4
-              with:
-                  dotnet-version: '6.0.x'
-            - name: Restore dependencies
-              run: |
-                dotnet restore
-            - name: dotnet build
-              run: |
-                dotnet build
-            - name: Dotnet publish
-              run: |
-                dotnet publish -o ${{ vars.artifactpath }}
-            - name: upload artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Dotnet artifact
-                  path: ${{ github.workspace }}/${{ vars.artifactpath }}
-                  retention-days: 5
-
-
-
-
-           
-            
-  
 #CI/CD job with matrix build          
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        java-version: [17, 18]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-      - name: setup java
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java-version}}
-          distribution: 'temurin'
-      ##- name: composite action
-        ##uses: ./.github/workflows
-      - name: create data
-        run: |
-            printf '{
-              "data_1": "Text data",
-              "data_2": true
-              }' >> testartifact.json
-      - uses: actions/upload-artifact@v3
-        with:
-          name: testartifact.json
-          path: ./
-
-              
-              
-      
-       
- #Download artifact 
-  Deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: development 
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v3
-      - name: Install NodeJS
-        uses: actions/setup-node@v3
-      - name: download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: testartifact.json
-          path: main
-      - name: Build project
-        run: echo "Build project"
-      - name: Deploy
-        run: echo "Deploying.."
-  test:
-    needs: Deploy
-    runs-on: ubuntu-latest
-    environment: testing-env
-    steps:
-      - name: List the files
-        
-        run: |
-          ls -la ${{ github.workspace }}
-      - run: echo " Testing done by listing files"
-        
-          
-                    
-      
-
-        
-
+    build:
+      strategy:
+        matrix:
+          os: [ubuntu-latest, windows-latest]
+          java-version: [17, 18]
+      runs-on: ${{ matrix.os }}
+      steps:
+        - name: checkout code
+          uses: actions/checkout@v4
+        - name: setup java
+          uses: actions/setup-java@v3
+          with:
+            java-version: ${{ matrix.java-version}}
+            distribution: 'temurin'
+        ##- name: composite action
+          ##uses: ./.github/workflows
+        - name: create data
+          run: |
+              printf '{
+                "data_1": "Text data",
+                "data_2": true
+                }' >> testartifact.json
+        - uses: actions/upload-artifact@v3
+          with:
+            name: testartifact.json
+            path: ./
   
-   
+                
+                
         
-      
+         
+   #Download artifact 
+    Deploy:
+      needs: build
+      runs-on: ubuntu-latest
+      environment: development 
+      steps:
+        - name: checkout code
+          uses: actions/checkout@v3
+        - name: Install NodeJS
+          uses: actions/setup-node@v3
+        - name: download artifacts
+          uses: actions/download-artifact@v3
+          with:
+            name: testartifact.json
+            path: main
+        - name: Build project
+          run: echo "Build project"
+        - name: Deploy
+          run: echo "Deploying.."
+    test:
+      needs: Deploy
+      runs-on: ubuntu-latest
+      environment: testing-env
+      steps:
+        - name: List the files
+          
+          run: |
+            ls -la ${{ github.workspace }}
+        - run: echo " Testing done by listing files"
+          
